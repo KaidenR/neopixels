@@ -1,0 +1,22 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "sudo node ./index.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "rpi-ws281x-native": "^1.0.0-alpha1"
+  },
+  "devDependencies": {
+    "jest": "^22.4.2",
+    "supertest": "^3.0.0"
+  }
+}
