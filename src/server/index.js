@@ -8,6 +8,11 @@ class NeoPixelServer {
     const app = this.app = express()
 
 
+    app.get('/on', this.handleGetOnRequest.bind(this))
+    app.get('/hue', this.handleGetHueRequest.bind(this))
+    app.get('/saturation', this.handleGetSaturationRequest.bind(this))
+    app.get('/brightness', this.handleGetBrightnessRequest.bind(this))
+
     app.post('/on/:value', this.handleSetOnRequest.bind(this))
     app.post('/hue/:value', this.handleSetHueRequest.bind(this))
     app.post('/saturation/:value', this.handleSetSaturationRequest.bind(this))
@@ -29,6 +34,22 @@ class NeoPixelServer {
     res.send(500, { error: err })
   }
 
+  handleGetOnRequest(req, res) {
+    res.status(200).send(this.neoPixels.isOn)
+  }
+
+  handleGetHueRequest(req, res) {
+    res.status(200).send(this.neoPixels.hue)
+  }
+
+  handleGetSaturationRequest(req, res) {
+    res.status(200).send(this.neoPixels.saturation)
+  }
+
+  handleGetBrightnessRequest(req, res) {
+    res.status(200).send(this.neoPixels.brightness)
+  }
+
   handleSetOnRequest(req, res) {
     console.log(`Setting ON to ${req.params.value}`)
     if (req.params.value === 'false') {
@@ -41,22 +62,23 @@ class NeoPixelServer {
   }
 
   handleSetHueRequest(req, res) {
-    let hue = req.params.value / 360
-    console.log(`Setting HUE to ${hue}`)
-    this.neoPixels.setHue(hue)
+    const { value } = req.params
+    console.log(`Setting HUE to ${value}`)
+    this.neoPixels.setHue(value)
     res.status(200).send()
   }
 
   handleSetSaturationRequest(req, res) {
-    let saturation = req.params.value / 100
-    this.neoPixels.setSaturation(saturation)
-    console.log(`Setting SATURATION to ${saturation}`)
-    res.send()
+    const { value } = req.params
+    console.log(`Setting SATURATION to ${value}`)
+    this.neoPixels.setSaturation(value)
+    res.status(200).send()
   }
 
   handleSetBrightnessRequest(req, res) {
-    console.log(`Setting BRIGHTNESS to ${req.params.value}`)
-    this.neoPixels.setBrightness(parseInt(req.params.value))
+    const { value } = req.params
+    console.log(`Setting BRIGHTNESS to ${value}`)
+    this.neoPixels.setBrightness(parseInt(value))
     res.status(200).send()
   }
 }
