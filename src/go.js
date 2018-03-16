@@ -2,41 +2,49 @@ const NeoPixels = require('./neoPixels')
 const Color = require('./neoPixels/color')
 
 const neoPixels = new NeoPixels()
+// neoPixels.sayHello()
+// neoPixels.setBrightness(50)
 
-let color = new Color(0,0,5,0)
+// neoPixels.fill(Color('blue'))
 
-// neoPixels.render(neoPixels.strip
-//   .setRange(0, 5, new Color(255,0,0,0))
-//   .setRange(6,10, new Color(0,255,0,0))
-// )
-
-// neoPixels.render(neoPixels.strip.clear())
-// neoPixels.fill(color)
-// neoPixels.setBrightness(100)
-
-// neoPixels.rainbow()
-
-// neoPixels.setBrightness(100)
-// let color = new Color(40,0,0,100)
-// neoPixels.render(neoPixels.strip
-//   .clear()
-  // .setRange(50, 140, color)
-  // .setRange(140, 217, color)
-// )
+setTimeout(() => neoPixels.sayHello(), 2000)
 
 
-// let i = 0;
-//
-// setInterval(() => {
-//   neoPixels.render(neoPixels.strip.setRange(i, i + 1, color))
-//   i = (i + 1) % neoPixels.channel.count
-// }, 50)
+// Bottom: 0 - 68
+// Right: 69 - 87
+// Top: 88 - 157
+// Left 157 - 177
 
-// let color = new Color(0,0,5,0)
+
+// // Show ruler
+// neoPixels.setBrightness(50)
+// let color = new Color.rgb(0,0,5)
 // for(let i = 0; i < neoPixels.channel.count; i += 10) {
 //   neoPixels.strip.setRange(i - 1, i, color)
 // }
 // neoPixels.render(neoPixels.strip)
 
-// neoPixels.setBrightness(100)
-// neoPixels.rainbow()
+
+// // Color sides
+// neoPixels.setBrightness(50)
+// neoPixels.render(neoPixels.strip
+//   .setRange(0, 69, Color('red'))
+//   .setRange(69, 88, Color('green'))
+//   .setRange(88, 158, Color('blue'))
+//   .setRange(158, 177, Color('orange'))
+// )
+
+
+// let i = 0
+// const interval = setInterval(() => {
+//   // if(i > 0)
+//   //   neoPixels.strip.setBlock(i - 1, 1, Color.rgbw(0,0,0,255))
+//   neoPixels.render(neoPixels.strip
+//     .fill(Color.rgbw(0,0,0,255))
+//     .setBlock(i, 1, Color.rgb(0,244,0))
+//   )
+//   i++
+//
+//   if (i > neoPixels.channel.count)
+//     clearInterval(interval)
+// }, 1000 / 177)

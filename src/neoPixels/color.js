@@ -30,9 +30,15 @@ Color.rgbw = function(r, g, b, w) {
   return color
 }
 
+Color.random = function() {
+  return Color.rgb(random(),random(), random())
+}
+
 function toHex(num) {
   const hex = (num & 0xff).toString(16)
   return hex.length < 2 ? '0' + hex : hex
 }
+
+function random() { return Math.random() * 255 }
 
 module.exports = Color

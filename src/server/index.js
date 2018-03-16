@@ -17,6 +17,7 @@ class NeoPixelServer {
     app.post('/hue/:value', this.handleSetHueRequest.bind(this))
     app.post('/saturation/:value', this.handleSetSaturationRequest.bind(this))
     app.post('/brightness/:value', this.handleSetBrightnessRequest.bind(this))
+    app.post('/sayHello', this.handleSayHelloRequest.bind(this))
 
     app.use(this.errorHandler)
   }
@@ -35,19 +36,19 @@ class NeoPixelServer {
   }
 
   handleGetOnRequest(req, res) {
-    res.status(200).send(this.neoPixels.isOn)
+    res.status(200).send({ value: this.neoPixels.isOn })
   }
 
   handleGetHueRequest(req, res) {
-    res.status(200).send(this.neoPixels.hue)
+    res.send({ value: this.neoPixels.hue})
   }
 
   handleGetSaturationRequest(req, res) {
-    res.status(200).send(this.neoPixels.saturation)
+    res.send({ value: this.neoPixels.saturation})
   }
 
   handleGetBrightnessRequest(req, res) {
-    res.status(200).send(this.neoPixels.brightness)
+    res.send({ value: this.neoPixels.brightness})
   }
 
   handleSetOnRequest(req, res) {
@@ -58,28 +59,33 @@ class NeoPixelServer {
       this.neoPixels.turnOn()
     }
 
-    res.status(200).send()
+    res.sendStatus(200)
   }
 
   handleSetHueRequest(req, res) {
-    const { value } = req.params
+    const value = parseInt(req.params.value)
     console.log(`Setting HUE to ${value}`)
     this.neoPixels.setHue(value)
-    res.status(200).send()
+    res.sendStatus(200)
   }
 
   handleSetSaturationRequest(req, res) {
-    const { value } = req.params
+    const value = parseInt(req.params.value)
     console.log(`Setting SATURATION to ${value}`)
     this.neoPixels.setSaturation(value)
-    res.status(200).send()
+    res.sendStatus(200)
   }
 
   handleSetBrightnessRequest(req, res) {
-    const { value } = req.params
+    const value = parseInt(req.params.value)
     console.log(`Setting BRIGHTNESS to ${value}`)
-    this.neoPixels.setBrightness(parseInt(value))
-    res.status(200).send()
+    this.neoPixels.setBrightness(value)
+    res.sendStatus(200)
+  }
+
+  handleSayHelloRequest(req, res) {
+    this.neoPixels.sayHello()
+    res.sendStatus(200)
   }
 }
 

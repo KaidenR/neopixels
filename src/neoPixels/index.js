@@ -7,7 +7,7 @@ const LED_COUNT = 177
 const FADE_UPDATE_INTERVAL = 1000 / 60
 const FADE_DURATION = 2000
 const FADE_EASING_FUNC = cubicInOut
-const COLOR_CHANGE_DELAY = 500
+const COLOR_CHANGE_DELAY = 200
 
 class NeoPixels {
   constructor() {
@@ -25,10 +25,19 @@ class NeoPixels {
   reset() {
     const colorNumber = Color.rgb(255,255,255).rgbwNumber()
     const colorArray = this.channel.array
-    for (let i = 0; i < this.channel.count; i++) {
+    for (let i = 0; i < LED_COUNT; i++) {
       colorArray[i] = colorNumber
     }
     ws281x.render(colorArray)
+  }
+
+  sayHello() {
+    const startBrightness = this.brightness
+    this.setBrightness(75, { duration: 300 })
+      .then(() => this.setBrightness(0, { duration: 500 }))
+      .then(() => this.setBrightness(75, { duration: 300 }))
+      .then(() => this.setBrightness(0, { duration: 500 }))
+      .then(() => this.setBrightness(startBrightness / 255 * 100, { duration: 200 }))
   }
 
   turnOff() {
@@ -117,27 +126,30 @@ class NeoPixels {
     this.updateColor()
   }
 
-  setBrightness(percent) {
-    clearInterval(this.fadeInterval)
+  setBrightness(percent, options = { duration: FADE_DURATION }) {
+    return new Promise(resolve => {
+      clearInterval(this.fadeInterval)
 
-    const start = Date.now()
-    const startBrightness = this.brightness
-    const targetBrightness = percent / 100 * 255
-    const brightnessDistance = targetBrightness - startBrightness
-    const increasing = targetBrightness > startBrightness
-    const limitFunc = increasing ? Math.min : Math.max
+      const start = Date.now()
+      const startBrightness = this.brightness
+      const targetBrightness = percent / 100 * 255
+      const brightnessDistance = targetBrightness - startBrightness
+      const increasing = targetBrightness > startBrightness
+      const limitFunc = increasing ? Math.min : Math.max
 
-    this.fadeInterval = setInterval(() => {
-      const ellapsedMillis = Date.now() - start
-      const time = ellapsedMillis / FADE_DURATION
-      const newBrightness = FADE_EASING_FUNC(time) * brightnessDistance + startBrightness
-      this.brightness = this.channel.brightness = limitFunc(targetBrightness, newBrightness)
-      ws281x.render(this.channel.array)
+      this.fadeInterval = setInterval(() => {
+        const ellapsedMillis = Date.now() - start
+        const time = ellapsedMillis / options.duration
+        const newBrightness = FADE_EASING_FUNC(time) * brightnessDistance + startBrightness
+        this.brightness = this.channel.brightness = limitFunc(targetBrightness, newBrightness)
+        ws281x.render(this.channel.array)
 
-      if(time > 1) {
-        clearInterval(this.fadeInterval)
-      }
-    }, FADE_UPDATE_INTERVAL)
+        if(time > 1) {
+          clearInterval(this.fadeInterval)
+          resolve()
+        }
+      }, FADE_UPDATE_INTERVAL)
+    })
   }
 
   cancelAnimation() {
