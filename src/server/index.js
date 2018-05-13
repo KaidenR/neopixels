@@ -1,12 +1,16 @@
 const express = require('express')
 
 const NeoPixels = require('../neoPixels')
+const getHealthCheckStatus = require('./getHealthCheckStatus')
 
 class NeoPixelServer {
   constructor() {
     this.neoPixels = new NeoPixels()
+    this.neoPixels.sayHello()
+
     const app = this.app = express()
 
+    app.get('/healthcheck', async (req, res) => { res.send(await getHealthCheckStatus()) })
 
     app.get('/on', this.handleGetOnRequest.bind(this))
     app.get('/hue', this.handleGetHueRequest.bind(this))
