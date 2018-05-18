@@ -1,3 +1,4 @@
+require('./src/config')
 const NeoPixelServer = require('./src/server')
 
 const server = new NeoPixelServer()

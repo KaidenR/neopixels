@@ -2,8 +2,8 @@ const ws281x = require('rpi-ws281x-native')
 
 const Color = require('./color')
 const Strip = require('./strip')
+const config = require('../config')
 
-const LED_COUNT = 177
 const FADE_UPDATE_INTERVAL = 1000 / 60
 const FADE_DURATION = 2000
 const FADE_EASING_FUNC = cubicInOut
@@ -11,7 +11,7 @@ const COLOR_CHANGE_DELAY = 200
 
 class NeoPixels {
   constructor() {
-    this.channel = ws281x(LED_COUNT, { stripType: 'sk6812-rgbw' });
+    this.channel = ws281x(config.neoPixels.ledCount, { stripType: 'sk6812-rgbw' });
 
     this.isOn = false
     this.hue = 0
@@ -25,7 +25,7 @@ class NeoPixels {
   reset() {
     const colorNumber = Color.rgb(255,255,255).rgbwNumber()
     const colorArray = this.channel.array
-    for (let i = 0; i < LED_COUNT; i++) {
+    for (let i = 0; i < config.neoPixels.ledCount; i++) {
       colorArray[i] = colorNumber
     }
     ws281x.render(colorArray)
@@ -160,7 +160,7 @@ class NeoPixels {
     let offset = 0;
     this.animationInterval = setInterval(function() {
       const colorArray = this.channel.array
-      for(let i = 0; i < LED_COUNT; i++) {
+      for(let i = 0; i < config.neoPixels.ledCount; i++) {
         colorArray[i] = colorwheel((offset + i) % 256);
       }
       offset = (offset + 1) % 256;
