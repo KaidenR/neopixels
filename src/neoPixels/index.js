@@ -8,10 +8,11 @@ const FADE_UPDATE_INTERVAL = 1000 / 60
 const FADE_DURATION = 2000
 const FADE_EASING_FUNC = cubicInOut
 const COLOR_CHANGE_DELAY = 200
+const { ledCount } = config.neoPixels
 
 class NeoPixels {
   constructor() {
-    this.channel = ws281x(config.neoPixels.ledCount, { stripType: 'sk6812-rgbw' });
+    this.channel = ws281x(ledCount, { stripType: 'sk6812-rgbw' });
 
     this.isOn = false
     this.hue = 0
@@ -23,26 +24,27 @@ class NeoPixels {
   }
 
   reset() {
-    const colorNumber = Color.rgb(255,255,255).rgbwNumber()
+    const colorNumber = Color.white.rgbwNumber()
     const colorArray = this.channel.array
-    for (let i = 0; i < config.neoPixels.ledCount; i++) {
+    for (let i = 0; i < ledCount; i++) {
       colorArray[i] = colorNumber
     }
-    ws281x.render(colorArray)
+    this.render(colorArray)
   }
 
   sayHello() {
     const startBrightness = this.brightness
-    this.setBrightness(75, { duration: 300 })
-      .then(() => this.setBrightness(0, { duration: 500 }))
-      .then(() => this.setBrightness(75, { duration: 300 }))
-      .then(() => this.setBrightness(0, { duration: 500 }))
-      .then(() => this.setBrightness(startBrightness / 255 * 100, { duration: 200 }))
+    this.fadeBrightness(0, 500)
+      .then(() => this.fadeBrightness(75, 300))
+      .then(() => this.fadeBrightness(0, 500))
+      .then(() => this.fadeBrightness(75, 300))
+      .then(() => this.fadeBrightness(0, 500))
+      .then(() => this.fadeBrightness(startBrightness / 255 * 100, 200))
   }
 
   turnOff() {
     if(this.isOn) {
-      this.setBrightness(0)
+      this.fadeBrightness(0)
       this.cancelAnimation()
       this.isOn = false
     }
@@ -50,7 +52,7 @@ class NeoPixels {
 
   turnOn() {
     if(!this.isOn) {
-      this.setBrightness(100)
+      this.fadeBrightness(100)
       this.isOn = true
     }
   }
@@ -58,20 +60,20 @@ class NeoPixels {
   fill(color) {
     const colorNumber = color.rgbwNumber()
     const colorArray = this.channel.array
-    for (let i = 0; i < this.channel.count; i++) {
-      colorArray[i] = colorNumber;
+    for (let i = 0; i < ledCount; i++) {
+      colorArray[i] = colorNumber
     }
 
     this.render(colorArray)
   }
 
   render(colorArray) {
-    this.turnOn()
     ws281x.render(colorArray)
   }
 
   updateColor() {
     clearTimeout(this.colorChangeTimeout)
+    this.turnOn()
 
     this.colorChangeTimeout = setTimeout(() => {
       this.cancelAnimation()
@@ -126,7 +128,12 @@ class NeoPixels {
     this.updateColor()
   }
 
-  setBrightness(percent, options = { duration: FADE_DURATION }) {
+  setBrightness(percent) {
+    this.brightness = this.channel.brightness = percent
+    this.render(this.channel.array)
+  }
+
+  fadeBrightness(percent, duration = FADE_DURATION) {
     return new Promise(resolve => {
       clearInterval(this.fadeInterval)
 
@@ -139,10 +146,9 @@ class NeoPixels {
 
       this.fadeInterval = setInterval(() => {
         const ellapsedMillis = Date.now() - start
-        const time = ellapsedMillis / options.duration
+        const time = ellapsedMillis / duration
         const newBrightness = FADE_EASING_FUNC(time) * brightnessDistance + startBrightness
-        this.brightness = this.channel.brightness = limitFunc(targetBrightness, newBrightness)
-        ws281x.render(this.channel.array)
+        this.setBrightness(limitFunc(targetBrightness, newBrightness))
 
         if(time > 1) {
           clearInterval(this.fadeInterval)
@@ -158,14 +164,14 @@ class NeoPixels {
 
   rainbow() {
     let offset = 0;
-    this.animationInterval = setInterval(function() {
+    this.animationInterval = setInterval(() => {
       const colorArray = this.channel.array
-      for(let i = 0; i < config.neoPixels.ledCount; i++) {
+      for(let i = 0; i < ledCount; i++) {
         colorArray[i] = colorwheel((offset + i) % 256);
       }
       offset = (offset + 1) % 256;
-      ws281x.render(colorArray);
-    }.bind(this), 1000 / 30);
+      this.render(colorArray);
+    }, 1000 / 30);
   }
 }
 

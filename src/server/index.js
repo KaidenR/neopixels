@@ -10,7 +10,7 @@ class NeoPixelServer {
 
     const app = this.app = express()
 
-    app.get('/healthcheck', async (req, res) => { res.send(await getHealthCheckStatus()) })
+    app.get('/healthcheck', this.handleHealthcheckRequest.bind(this))
 
     app.get('/on', this.handleGetOnRequest.bind(this))
     app.get('/hue', this.handleGetHueRequest.bind(this))
@@ -37,6 +37,10 @@ class NeoPixelServer {
   errorHandler(err, req, res, next) {
     console.error(err.stack)
     res.send(500, { error: err })
+  }
+
+  async handleHealthcheckRequest(req, res) {
+    res.send(await getHealthCheckStatus())
   }
 
   handleGetOnRequest(req, res) {
@@ -83,7 +87,7 @@ class NeoPixelServer {
   handleSetBrightnessRequest(req, res) {
     const value = parseInt(req.params.value)
     console.log(`Setting BRIGHTNESS to ${value}`)
-    this.neoPixels.setBrightness(value)
+    this.neoPixels.fadeBrightness(value)
     res.sendStatus(200)
   }
 

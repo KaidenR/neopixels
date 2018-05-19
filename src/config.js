@@ -6,7 +6,4 @@ if (!fs.existsSync(configPath)) {
   throw new Error(`Missing "config.js"`)
 }
 
-console.log('requiring', configPath)
 module.exports = require(configPath)
-
-console.log('exported', module.exports)

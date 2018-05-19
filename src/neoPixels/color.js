@@ -23,6 +23,16 @@ Object.assign(Color.prototype, {
   }
 })
 
+Color.fromRgbwNumber = function(number) {
+  const string = number.toString(16)
+  const w = parseInt(string.slice(0,2), 16)
+  const g = parseInt(string.slice(2,4), 16)
+  const r = parseInt(string.slice(4,6), 16)
+  const b = parseInt(string.slice(6,8), 16)
+
+  return Color.rgbw(r,g,b,w)
+}
+
 Color.rgbw = function(r, g, b, w) {
   const color = Color.rgb(r, g, b)
   color.color[3] = w
@@ -31,7 +41,7 @@ Color.rgbw = function(r, g, b, w) {
 }
 
 Color.random = function() {
-  return Color.rgb(random(),random(), random())
+  return Color.rgbw(random(),random(), random(), random())
 }
 
 function toHex(num) {
@@ -40,5 +50,9 @@ function toHex(num) {
 }
 
 function random() { return Math.random() * 255 }
+
+Color.black = Color.rgbw(0,0,0,0)
+Color.white = Color.rgbw(0,0,0,255)
+Color.blue = Color.rgbw(0,0,255,0)
 
 module.exports = Color
